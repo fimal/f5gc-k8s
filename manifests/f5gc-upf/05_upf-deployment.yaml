@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-upf
+  labels:
+    app: f5gc-upf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-upf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-upf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: f5gc-upf-n3, f5gc-upf-n4, f5gc-upf-n6
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-upf
+          image: local/f5gc-upf:debug
+          #image: free5gc/upf:latest
+          imagePullPolicy: IfNotPresent
+          command: [ "./free5gc-upfd" ]
+          args: [ "-f", "../config/upfcfg.yaml" ]
+          #args: [ "-c", "./free5gc-upfd -f ../config/upfcfg.yaml; ip address add 60.60.0.101/32 dev lo" ]
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: true
+            capabilities:
+              add: ["NET_ADMIN", "SYS_TIME"]
+          volumeMounts:
+            - name: f5gc-upf-config
+              mountPath: /free5gc/config
+            - mountPath: /dev/net/tun
+              name: tun-devdir
+          ports:
+            - containerPort: 2152
+              name: if-n3
+              protocol: UDP
+            - containerPort: 8805
+              name: if-n4
+              protocol: UDP
+        - name: tcpdump
+          image: corfr/tcpdump
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-upf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-upf-config
+          configMap:
+            name: f5gc-upf-config
+        - name: tun-devdir
+          hostPath:
+            path: /dev/net/tun

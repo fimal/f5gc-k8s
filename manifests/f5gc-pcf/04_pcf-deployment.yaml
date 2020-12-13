@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-pcf
+  labels:
+    app: f5gc-pcf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-pcf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-pcf
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-pcf
+          image: local/f5gc-pcf:v3.0.4
+          #image: free5gc/pcf:latest
+          imagePullPolicy: IfNotPresent
+          command: [ "./pcf" ]
+          args: [ "-pcfcfg", "../config/pcfcfg.conf" ]
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: f5gc-pcf-config
+              mountPath: /free5gc/config
+            - name: f5gc-pcf-cert
+              mountPath: /free5gc/support/TLS
+          ports:
+            - containerPort: 29507
+              name: f5gc-pcf
+              protocol: TCP
+        - name: tcpdump
+          image: corfr/tcpdump
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-pcf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-pcf-cert
+          secret:
+            secretName: f5gc-pcf-tls-secret
+        - name: f5gc-pcf-config
+          configMap:
+            name: f5gc-pcf-config

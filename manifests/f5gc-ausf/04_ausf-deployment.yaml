@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-ausf
+  labels:
+    app: f5gc-ausf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-ausf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-ausf
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-ausf
+          #image: free5gc/ausf:latest
+          image: local/f5gc-ausf:v3.0.4
+          imagePullPolicy: IfNotPresent
+          command: [ "./ausf" ]
+          args: [ "-ausfcfg", "../config/ausfcfg.conf" ]
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: f5gc-ausf-config
+              mountPath: /free5gc/config
+            - name: f5gc-ausf-cert
+              mountPath: /free5gc/support/TLS
+          ports:
+            - containerPort: 29509
+              name: f5gc-ausf
+              protocol: TCP
+        - name: tcpdump
+          image: corfr/tcpdump
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-ausf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-ausf-cert
+          secret:
+            secretName: f5gc-ausf-tls-secret
+        - name: f5gc-ausf-config
+          configMap:
+            name: f5gc-ausf-config

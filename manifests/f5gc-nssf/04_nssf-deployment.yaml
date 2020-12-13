@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-nssf
+  labels:
+    app: f5gc-nssf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-nssf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-nssf
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-nssf
+          image: local/f5gc-nssf:v3.0.4
+          #image: free5gc/nssf:latest
+          imagePullPolicy: IfNotPresent
+          command: [ "./nssf" ]
+          args: [ "-nssfcfg", "../config/nssfcfg.conf" ]
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: f5gc-nssf-config
+              mountPath: /free5gc/config
+            - name: f5gc-nssf-cert
+              mountPath: /free5gc/support/TLS
+          ports:
+            - containerPort: 29531
+              name: f5gc-nssf
+              protocol: TCP
+        - name: tcpdump
+          image: corfr/tcpdump
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-nssf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-nssf-cert
+          secret:
+            secretName: f5gc-nssf-tls-secret
+        - name: f5gc-nssf-config
+          configMap:
+            name: f5gc-nssf-config

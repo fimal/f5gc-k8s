@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: f5gc-amf
+  labels:
+    app: f5gc-amf
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: f5gc-amf
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: f5gc-amf
+      annotations:
+        k8s.v1.cni.cncf.io/networks: f5gc-amf-n1n2
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+        - name: f5gc-amf
+          image: local/f5gc-amf:debug
+          #image: local/f5gc-amf:v3.0.4
+          #image: free5gc/amf:latest
+          imagePullPolicy: IfNotPresent
+          command: [ "./amf" ]
+          args: [ "-amfcfg", "../config/amfcfg.conf", "-free5gccfg", "../config/free5GC.conf" ]
+          # imagePullPolicy: Always
+          securityContext:
+            privileged: false
+          volumeMounts:
+            - name: f5gc-amf-config
+              mountPath: /free5gc/config
+            - name: f5gc-amf-cert
+              mountPath: /free5gc/support/TLS
+          ports:
+            - containerPort: 29518
+              name: f5gc-amf
+              protocol: TCP
+            - containerPort: 38412
+              name: if-n1n2
+              protocol: SCTP
+        - name: tcpdump
+          image: corfr/tcpdump
+          imagePullPolicy: IfNotPresent
+          command:
+            - /bin/sleep
+            - infinity
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      serviceAccountName: f5gc-amf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: f5gc-amf-cert
+          secret:
+            secretName: f5gc-amf-tls-secret
+        - name: f5gc-amf-config
+          configMap:
+            name: f5gc-amf-config

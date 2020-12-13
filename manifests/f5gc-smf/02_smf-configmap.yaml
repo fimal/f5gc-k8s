@@ -1,0 +1,193 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: f5gc-smf-config
+data:
+  smfcfg.conf: |
+    info:
+      version: 1.0.0
+      description: AMF initial local configuration
+
+    configuration:
+      smfName: SMF
+      sbi:
+        scheme: http
+        registerIPv4: f5gc-smf
+        bindingIPv4: 0.0.0.0
+        port: 29502
+        tls:
+          key: free5gc/support/TLS/smf.key
+          pem: free5gc/support/TLS/smf.pem
+      serviceNameList:
+        - nsmf-pdusession
+        - nsmf-event-exposure
+        - nsmf-oam
+      snssai_info:
+        - sNssai:
+            sst: 1
+            sd: 010203
+          dnnSmfInfoList:
+            - dnn: internet
+        - sNssai:
+            sst: 1
+            sd: 112233
+          dnnSmfInfoList:
+            - dnn: internet
+      pfcp:
+        addr: 172.16.30.20
+      userplane_information:
+        up_nodes:
+          gNB1:
+            type: AN
+            an_ip: 192.168.10.32
+          UPF:
+            type: UPF
+            node_id: 172.16.30.30
+        links:
+          - A: gNB1
+            B: UPF
+      ue_subnet: 60.60.0.0/16
+      dnn:
+        internet:
+          dns:
+            ipv4: 8.8.8.8
+            ipv6: 2001:4860:4860::8888
+        internet2:
+          dns:
+            ipv4: 8.8.4.4
+            ipv6: 2001:4860:4860::8844
+      nrfUri: http://f5gc-nrf:29510
+
+  uerouting.yaml: |
+    info:
+      version: 1.0.0
+      description: Routing information for UE
+
+    ueRoutingInfo:
+      - SUPI: imsi-2089300007487
+        AN: 172.16.30.30
+        PathList:
+          - DestinationIP: 60.60.0.101
+            UPF: !!seq
+              - UPF
+
+          - DestinationIP: 60.60.0.103
+            UPF: !!seq
+              - UPF
+
+          - DestinationIP: 172.15.10.1
+            UPF: !!seq
+              - UPF
+
+      - SUPI: imsi-208930000000003
+        AN: 172.16.30.30
+        PathList:
+          - DestinationIP: 60.60.0.101
+            #DestinationPort: 8888
+            UPF: !!seq
+              - UPF
+
+          - DestinationIP: 60.60.0.103
+            #DestinationPort: 9999
+            UPF: !!seq
+              - UPF
+
+          - DestinationIP: 172.15.10.1
+            UPF: !!seq
+              - UPF
+
+      - SUPI: imsi-2089300007486
+        AN: 172.16.30.30
+        PathList:
+          - DestinationIP: 10.195.5.182
+            #DestinationPort: 8888
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF1
+
+          - DestinationIP: 10.195.5.182
+            #DestinationPort: 9999
+            UPF: !!seq
+              - BranchingUPF
+              - AnchorUPF2
+    routeProfile:
+      MEC1:
+        forwardingPolicyID: 10
+
+    pfdDataForApp:
+      - applicationId: edge
+        pfds:
+          - pfdID: pfd1
+            flowDescriptions:
+              - permit out ip from 60.60.0.1 8080 to any
+  free5GC.conf: |
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: debug
+        ReportCaller: true
+      SMF:
+        debugLevel: debug
+        ReportCaller: true
+      UDR:
+        debugLevel: debug
+        ReportCaller: true
+      UDM:
+        debugLevel: debug
+        ReportCaller: true
+      NRF:
+        debugLevel: debug
+        ReportCaller: true
+      PCF:
+        debugLevel: debug
+        ReportCaller: true
+      AUSF:
+        debugLevel: debug
+        ReportCaller: true
+      N3IWF:
+        debugLevel: debug
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: debug
+        ReportCaller: true
+      FSM:
+        debugLevel: debug
+        ReportCaller: true
+      NGAP:
+        debugLevel: debug
+        ReportCaller: true
+      NamfComm:
+        debugLevel: debug
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: debug
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: debug
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: debug
+        ReportCaller: true
+      OpenApi:
+        debugLevel: debug
+        ReportCaller: true
+      Aper:
+        debugLevel: debug
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: debug
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: debug
+        ReportCaller: true
