@@ -23,7 +23,7 @@ spec:
         runAsGroup: 0
       containers:
         - name: f5gc-upf
-          image: local/f5gc-upf:debug
+          image: local/f5gc-upf:v3.0.4
           #image: free5gc/upf:latest
           imagePullPolicy: IfNotPresent
           command: [ "./free5gc-upfd" ]

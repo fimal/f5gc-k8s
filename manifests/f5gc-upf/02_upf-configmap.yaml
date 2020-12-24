@@ -19,6 +19,7 @@ data:
 
       gtpu:
         - addr: 192.168.10.20
+        - addr: 172.16.10.32
         # [optional] gtpu.name
         # - name: upf.5gc.nctu.me
         # [optional] gtpu.ifname
