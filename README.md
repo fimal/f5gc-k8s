@@ -35,6 +35,22 @@ $ kubectl apply -f clusters/cni/multus/			# installing multus
 
 ```
 $ cd images
-$ make base		# building base image
+$ make build-base	# building base image
+$ make build-amf    # building amf image
+$ make build-container
 
+```
+ * Build IC (IMSI Cracking)
+ * NAT rules
+
+```
+$ iptables -t nat -A POSTROUTING -s 60.60.0.0/16 -d 10.98.0.0/16 -j SNAT --to-source 172.20.104.54 #add rule
+$ iptables -t nat -v -L POSTROUTING -n --line-number             # list all nat rules
+$ iptables -t nat -D POSTROUTING 1                               # delete rule line 1
+
+```
+ * Tuning MTU - k8s node configure mtu
+
+```
+ $ p link set dev ens224 mtu 9000
 ```
