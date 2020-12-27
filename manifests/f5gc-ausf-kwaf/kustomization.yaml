@@ -1,0 +1,20 @@
+resources:
+  - 00_preinstall_job.yaml
+  - 01_ausf-sa.yaml
+  - 02_ausf-rbac.yaml
+  - 03_ausf-configmap.yaml
+  - 04_ausf-profile.yaml
+  - 05_ausf-kwaf-service.yaml
+  - 06_ausf-kwaf-deployment.yaml
+
+namespace: f5gc
+
+secretGenerator:
+- name: f5gc-ausf-tls-secret
+  namespace: f5gc
+  files:
+  - cert/ausf.pem
+  - cert/ausf.key
+  type: "Opaque"
+generatorOptions:
+  disableNameSuffixHash: true

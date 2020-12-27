@@ -1,0 +1,53 @@
+{
+    "eventMap": {
+      "map": [
+        {
+          "value": "json:attack",
+          "key": "ParamName"
+        },
+        {
+          "value": "select * from user_table",
+          "key": "ParamValue"
+        },
+        {
+          "value": "Parameters",
+          "key": "Zone"
+        },
+        {
+          "value": "ParamTypeBodyJson",
+          "key": "ParamType"
+        },
+        {
+          "key": "Encoding"
+        }
+      ]
+    },
+    "tags": [
+      "_geoip_lookup_failure"
+    ],
+    "eventModule": "5G Attacks",
+    "rule": "123A",
+    "sourceHostname": "gNB2",
+    "policyVersionHash": "-",
+    "actorRemoteAddr": "-",
+    "action": "REPORT",
+    "example": "SELECT tbl_tarot FROM db_named",
+    "title": "IMSI cracking",
+    "eventSignature": "123A",
+    "trafficMethod": "POST",
+    "details": "details",
+    "trafficUri": "/nausf-auth/v1/ue-authentications",
+    "trafficTransId": "{{.TransID}}",
+    "policyName": "waas-f5gc-ausf-policy",
+    "waas_profile": "f5gc/waas-f5gc-ausf-profile",
+    "attack_sev": "High",
+    "eventId": "by_rule",
+    "@timestamp": "{{.TransTime}}",
+    "policyProtectionId": "nausf-auth-p1",
+    "dynamic": "",
+    "description": "IMSI Cracking detected from cell nR-CGI = PLMN: 20893 nRCellIdentity: 0x0000000010 tAC: 0x000001",
+    "policyClsId": "nausf-auth",
+    "threat": "IMSI cracking",
+    "attack": "Brute Force",
+    "waas_tag": "waas-f5gc-ausf"
+  }

@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: WAAS
+    app.kubernetes.io/name: WAAS
+    app: f5gc-ausf
+  name: waas-f5gc-ausf-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      configid: waas-f5gc-ausf-container
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: WAAS
+        app.kubernetes.io/name: WAAS
+        configid: waas-f5gc-ausf-container
+    spec:
+      containers:
+      - name: waas-f5gc-ausf
+        image: local/f5gc-ausf:v3.0.4
+        imagePullPolicy: IfNotPresent
+        command: [ "./ausf" ]
+        args: [ "-ausfcfg", "../config/ausfcfg.conf" ]
+        ports:
+        - containerPort: 29509
+          name: f5gc-ausf
+          protocol: TCP
+        securityContext:
+          privileged: true
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: f5gc-ausf-config
+          mountPath: /free5gc/config
+        - name: f5gc-ausf-cert
+          mountPath: /free5gc/support/TLS
+      - name: enforcer
+        command:
+        - /wrapper.sh
+        - -m=waas-controller-service
+        - -p=f5gc/waas-sample-app-f5gc-ausf-profile
+        - -n=kwaf
+        - -t=waas-sample-app-f5gc-ausf
+        - -e
+        - -c=9000:waas-sample-app-f5gc-ausf-policy:127.0.0.1:29509
+        - -l=$HOSTNAME_access.log
+        - -f=$HOSTNAME_security.log
+        env:
+        - name: ENFORCER_OPT_L
+          value: info
+        - name: ENFORCER_OPT_BASE_ID
+          value: "323"
+        image: devart01:8081/waas-snapshot-local/waas-bootstrap/dev:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 19010
+          name: stats
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /logs
+          name: logs-volume
+      - env:
+        - name: PROCESS_TO_SIGNAL
+          value: waas_enforcer
+        image: devart01:8081/waas-snapshot-local/waas-logrotate/dev:latest
+        imagePullPolicy: IfNotPresent
+        name: logrotate
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /logs
+          name: logs-volume
+      - env:
+        - name: FB_LS_HOST
+          value: waas-logstash-service.kwaf.svc.cluster.local
+        - name: FB_PREFIX
+          value: waas-f5gc-ausf.f5gc
+        image: devart01:8081/waas-snapshot-local/waas-fluentbit/dev:latest
+        imagePullPolicy: IfNotPresent
+        name: fluentbit
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - name: securebeat-client-volume-f5gc-ausf
+          mountPath: /etc/securebeat/client
+        - name: securebeat-ca-volume-f5gc-ausf
+          mountPath: /etc/securebeat/ca
+        - name: logs-volume
+          mountPath: /logs
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      shareProcessNamespace: true
+      serviceAccountName: f5gc-ausf-sa
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: securebeat-ca-volume-f5gc-ausf
+        configMap:
+          defaultMode: 420
+          name: waas-securebeat-ca-config-ausf
+      - name: securebeat-client-volume-f5gc-ausf
+        secret:
+          defaultMode: 420
+          secretName: waas-securebeat-client-secret-ausf
+      - emptyDir: {}
+        name: logs-volume
+      - name: f5gc-ausf-cert
+        secret:
+          defaultMode: 420
+          secretName: f5gc-ausf-tls-secret
+      - name: f5gc-ausf-config
+        configMap:
+          defaultMode: 420
+          name: f5gc-ausf-config
+

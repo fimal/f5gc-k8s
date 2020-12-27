@@ -1,0 +1,25 @@
+---
+# Source: free5gc-apps/charts/f5gc/templates/profile.yaml
+apiVersion: waas.radware.com/v1beta1
+kind: Profile
+metadata:
+  name:  waas-f5gc-ausf-profile
+  labels:    
+    app.kubernetes.io/instance : WAAS
+    app.kubernetes.io/name : WAAS
+    release: f5gc-ausf
+spec:
+  policies:
+  - name: waas-f5gc-ausf-policy
+    operatorEmail: support@radware.com
+    protections:
+    - id: protection1
+      signatures:
+        opMode: Active
+    classifiers:
+    - protectionId: protection1
+      hostname: '*'
+      id: classifier1
+      path:
+        operand: Prefix
+        value: /

@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: WAAS
+  name: waas-ic-deployment
+  namespace: kwaf
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      configid: waas-ic-container
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app.kubernetes.io/instance: WAAS
+        configid: waas-ic-container
+    spec:
+      containers:
+      - env:
+        - name: ELASTIC_ADDRESS
+          value: "waas-elasticsearch-service-exposed.kwaf.svc.cluster.local"
+        - name: ELASTIC_PORT
+          value: "443"
+        - name: ELASTIC_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: waas-esauth-secret
+        - name: ELASTIC_PASS
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: waas-esauth-secret
+        image: ic:latest
+        imagePullPolicy: Never
+        name: ic
+        args:
+        - /ic
+        - -interval=10s
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
