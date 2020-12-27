@@ -1,5 +1,5 @@
 # Project Title
-This is helm for sample app
+This is helm for free5gc app secured by Radware KWAF
 ## Getting Started
 git clone https://github.com/fimal/f5gc-k8s.git
 
