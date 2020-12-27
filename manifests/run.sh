@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # - the right sequence to start mongo upf nrf amf smf udr pcf udm nssf ausf webui
-NF_LIST="f5gc-upf f5gc-mongodb f5gc-nrf f5gc-amf f5gc-ausf f5gc-nssf f5gc-pcf  f5gc-smf f5gc-udm f5gc-udr f5gc-webui dbg-rockmongo"
+NF_LIST="f5gc-upf f5gc-mongodb f5gc-nrf f5gc-amf f5gc-ausf-kwaf f5gc-nssf f5gc-pcf  f5gc-smf f5gc-udm f5gc-udr f5gc-webui dbg-rockmongo"
 
 CMD_POOL="apply|delete|show"
 if [[ ! "$1" =~ $CMD_POOL ]]

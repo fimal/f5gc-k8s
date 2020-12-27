@@ -8,10 +8,23 @@ RUN apt-get clean
 
 # Get Free5GC v3.0.4
 ENV FREE5GC_VERSION=v3.0.4
+
+# RUN cd $GOPATH/src \
+#     && git clone --recursive -j 33 -b ${FREE5GC_VERSION} https://github.com/free5gc/free5gc.git \
+#     && cd free5gc \
+#     && go mod download
+
+# Get Free5GC with amf header enrichment
 RUN cd $GOPATH/src \
-    && git clone --recursive -j 33 -b ${FREE5GC_VERSION} https://github.com/free5gc/free5gc.git \
-    && cd free5gc \
-    && go mod download
+    && git clone --recursive -j `nproc` https://github.com/fimal/free5gc.git
+RUN cd $GOPATH/src/free5gc \
+&& git checkout master \
+&& git submodule sync \
+&& git submodule update --init --jobs `nproc` \
+&& git submodule foreach git checkout master \
+&& git submodule foreach git pull --jobs `nproc` \
+&& go mod download
+
 
 COPY Makefile $GOPATH/src/free5gc/Makefile
 
