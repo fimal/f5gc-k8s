@@ -1,0 +1,125 @@
+global:
+  app:
+    name: ausf
+    image:
+      registry: local
+      version: /f5gc-ausf:v3.0.4
+      pullPolicy: IfNotPresent
+    command: [ "./ausf" ]
+    args: [ "-ausfcfg", "../config/ausfcfg.conf" ]
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: f5gc-ausf-config
+        mountPath: /free5gc/config
+      - name: f5gc-ausf-cert
+        mountPath: /free5gc/support/TLS
+    ports:
+      - containerPort: 29509
+        name: f5gc-ausf
+        protocol: TCP
+  volumes:
+    - name: f5gc-ausf-cert
+      secret:
+        secretName: f5gc-ausf-tls-secret
+#TODO move to template config-map and secret:
+    - name: f5gc-ausf-config
+      configMap:
+        name: waas-f5gc-ausf
+  serviceType: NodePort
+  nodePort: 31023
+#TODO catch port from global.app:
+  containerPort: 29509
+  cfg:
+    info:
+      version: 1.0.0
+      description: AUSF initial local configuration
+
+    configuration:
+      sbi:
+        scheme: http
+        registerIPv4: f5gc-ausf    # Can also be a kubernetes service IP or domain name.
+        bindingIPv4: 0.0.0.0        # Can also be an ENV.
+        port: 29509
+      serviceNameList:
+        - nausf-auth
+      nrfUri: http://f5gc-nrf:29510
+      plmnSupportList:
+        - mcc: 208
+          mnc: 93
+        - mcc: 123
+          mnc: 45
+      groupId: ausfGroup001
+  free5GC:
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: info
+        ReportCaller: true
+      SMF:
+        debugLevel: info
+        ReportCaller: true
+      UDR:
+        debugLevel: info
+        ReportCaller: true
+      UDM:
+        debugLevel: info
+        ReportCaller: true
+      NRF:
+        debugLevel: info
+        ReportCaller: true
+      PCF:
+        debugLevel: info
+        ReportCaller: true
+      AUSF:
+        debugLevel: info
+        ReportCaller: true
+      N3IWF:
+        debugLevel: info
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: info
+        ReportCaller: true
+      FSM:
+        debugLevel: info
+        ReportCaller: true
+      NGAP:
+        debugLevel: info
+        ReportCaller: true
+      NamfComm:
+        debugLevel: info
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: info
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: info
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: info
+        ReportCaller: true
+      OpenApi:
+        debugLevel: info
+        ReportCaller: true
+      Aper:
+        debugLevel: info
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: info
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: info
+        ReportCaller: true
+
+

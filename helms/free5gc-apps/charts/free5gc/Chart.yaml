@@ -1,0 +1,6 @@
+apiVersion: v2
+appVersion: "1.0"
+description: Free5Gc WAAS Application mode
+name: f5gc
+version: 1.3.0
+icon: https://www.radware.com/RadwareNext/images/logo.svg

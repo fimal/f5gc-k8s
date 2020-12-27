@@ -1,0 +1,24 @@
+{{- if .Values.enabled }}
+apiVersion: waas.radware.com/v1beta1
+kind: Profile
+metadata:
+  name:  {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-profile
+  labels:
+{{- include "waas.labels" . | indent 4 }}
+    release: {{ .Release.Name }}
+spec:
+  policies:
+  - name: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-policy
+    operatorEmail: support@radware.com
+    protections:
+    - id: protection1
+      signatures:
+        opMode: Active
+    classifiers:
+    - protectionId: protection1
+      hostname: '*'
+      id: classifier1
+      path:
+        operand: Prefix
+        value: /
+{{- end }}

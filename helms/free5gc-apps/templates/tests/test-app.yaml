@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "{{ .Values.global.namesPrefix }}{{ .Chart.Name}}-{{ .Values.global.app.name}}-container-test"
+  labels:
+    release: {{ .Release.Name }}
+    target: helm-{{ .Values.global.app.name}}-test
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: helm-{{ .Values.global.app.name}}-test
+          image: {{ .Values.global.image.registry }}/waas-kubectl{{ .Values.global.image.version }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: SERVICE_NAME
+              value: {{ .Values.global.namesPrefix }}{{ .Chart.Name}}-{{ .Values.global.app.name}}-service
+          command: ["/bin/bash", "-c"]
+          args:
+            - |-
+{{ .Files.Get "files/test_app.sh" | indent 14 }}

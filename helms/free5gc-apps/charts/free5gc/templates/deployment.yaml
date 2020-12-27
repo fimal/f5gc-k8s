@@ -1,0 +1,81 @@
+{{- if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-deployment
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+spec:
+  selector:
+    matchLabels:
+      configid: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-container
+  template:
+    metadata:
+      labels:
+        configid: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-container
+        {{- include "waas.labels" . | indent 8 }}
+    spec:
+      shareProcessNamespace: true
+      containers:
+        - name: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}
+          image: {{ .Values.global.app.image.registry}}{{ .Values.global.app.image.version}}
+          imagePullPolicy: {{ .Values.global.app.image.pullPolicy }}
+          command:
+            {{- toYaml .Values.global.app.command | nindent 12 }}
+          args:
+            {{- toYaml .Values.global.app.args | nindent 12 }}
+          volumeMounts:
+            {{- toYaml .Values.global.app.volumeMounts | nindent 12 }}
+          ports:
+            {{- toYaml .Values.global.app.ports | nindent 12 }}
+        - name: enforcer
+          ports:
+            - name: stats
+              containerPort: 19010
+          image: {{ include "image.registry" . | coalesce .Values.containers.enforcer.registry }}/waas-bootstrap{{ include "image.version" . | coalesce .Values.containers.enforcer.version }}
+          command:
+            - "/wrapper.sh"
+            - "-m={{ .Values.global.namesPrefix }}controller-service"
+            - "-p={{ .Release.Namespace }}/{{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-profile"
+            - "-n={{ required "A valid KWAF Namespace required!" .Values.global.kwafns  }}"
+            - "-t={{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}"
+            - "-e"
+            - "-c=9000:{{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-policy:127.0.0.1:{{ .Values.global.containerPort }}"
+            - "-l=$HOSTNAME_access.log"
+            - "-f=$HOSTNAME_security.log"
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: ENFORCER_OPT_L
+              value: info
+            - name: ENFORCER_OPT_BASE_ID
+              value: "323"
+          volumeMounts:
+            - mountPath: /logs
+              name: logs-volume
+        - name: logrotate
+          image: {{ include "image.registry" . | coalesce .Values.containers.logrotate.registry }}/waas-logrotate{{ include "image.version" . | coalesce .Values.containers.logrotate.version }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: PROCESS_TO_SIGNAL
+              value: waas_enforcer
+          volumeMounts:
+            - name: logs-volume
+              mountPath: /logs
+        {{- include "fluent-bit-container" . | indent 8 }}
+      serviceAccountName: {{ .Chart.Name }}-{{ .Values.global.app.name}}-sa
+      volumes:
+      {{- include "fluent-bit-volumes" . | indent 6 }}
+      {{- toYaml .Values.global.volumes | nindent 6 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}

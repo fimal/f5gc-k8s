@@ -1,0 +1,22 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.global.app.name }}-postdelete-role
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": "post-delete"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["delete"]
+    resourceNames:
+      - "{{ .Values.global.namesPrefix }}securebeat-ca-config-{{ .Values.global.app.name }}"
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["delete"]
+    resourceNames:
+      - "{{ .Values.global.namesPrefix }}securebeat-client-secret-{{ .Values.global.app.name }}"
+      - "{{ .Values.global.namesPrefix }}securebeat-server-secret-{{ .Values.global.app.name }}"

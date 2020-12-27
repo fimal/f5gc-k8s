@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+data:
+  {{ .Values.global.app.name}}cfg.conf: |
+    {{- toYaml .Values.global.cfg | nindent 4 }}
+
+  free5GC.conf: |
+    {{- toYaml .Values.global.free5GC | nindent 4 }}

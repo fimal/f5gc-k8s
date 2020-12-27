@@ -1,0 +1,15 @@
+# Default values for httpbin.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+global:
+  app:
+    name:
+  # Namespace where KWAF controller deployed (need for enforcer sidecar configuration and certificates copy)
+  # This parameter is required and should be correctly supplied through helm install "--set" or values.yaml
+  kwafns: kwaf
+  # Service types are:  LoadBalancer | NodePort | ClusterIP
+  serviceType: NodePort
+
+
+
+

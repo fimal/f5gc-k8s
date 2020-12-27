@@ -1,0 +1,12 @@
+image:
+  registry:
+  version:
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+## settings for specific containers
+containers:
+  postdelete:
+    registry:
+    version:

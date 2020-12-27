@@ -1,0 +1,124 @@
+global:
+  app:
+    name: nrf
+    image:
+      registry: local
+      version: /f5gc-nrf:v3.0.4
+      pullPolicy: IfNotPresent
+    command: [ "./nrf" ]
+    args: [ "-nrfcfg", "../config/nrfcfg.conf" ]
+    securityContext:
+      privileged: true
+    volumeMounts:
+      - name: f5gc-nrf-config
+        mountPath: /free5gc/config
+      - name: f5gc-nrf-cert
+        mountPath: /free5gc/support/TLS
+    ports:
+      - containerPort: 29510
+        name: f5gc-nrf
+        protocol: TCP
+  volumes:
+    - name: f5gc-nrf-cert
+      secret:
+        secretName: f5gc-nrf-tls-secret
+#TODO move to template config-map and secret:
+    - name: f5gc-nrf-config
+      configMap:
+        name: waas-f5gc-nrf
+  serviceType: NodePort
+  nodePort: 31024
+#TODO catch port from global.app:
+  containerPort: 29510
+  cfg:
+    info:
+      version: 1.0.0
+      description: NRF initial local configuration
+    configuration:
+      MongoDBName: "free5gc"
+      MongoDBUrl: "mongodb://f5gc-mongodb:27017"
+      DefaultServiceIP: "f5gc-nrf"
+      sbi:
+        scheme: http
+        ipv4Addr: 0.0.0.0
+        port: 29510
+      DefaultPlmnId:
+        mcc: "208"
+        mnc: "93"
+      serviceNameList:
+        - nnrf-nfm
+        - nnrf-disc
+
+  free5GC:
+    db_uri: mongodb://f5gc-mongodb:27017/free5GC
+    #all logging levels
+    #panic
+    #fatal
+    #error
+    #warn
+    #info
+    #debug
+    #trace
+    logger:
+    # network function
+      AMF:
+        debugLevel: info
+        ReportCaller: true
+      SMF:
+        debugLevel: info
+        ReportCaller: true
+      UDR:
+        debugLevel: info
+        ReportCaller: true
+      UDM:
+        debugLevel: info
+        ReportCaller: true
+      NRF:
+        debugLevel: info
+        ReportCaller: true
+      PCF:
+        debugLevel: info
+        ReportCaller: true
+      AUSF:
+        debugLevel: info
+        ReportCaller: true
+      N3IWF:
+        debugLevel: info
+        ReportCaller: true
+    # library
+      NAS:
+        debugLevel: info
+        ReportCaller: true
+      FSM:
+        debugLevel: info
+        ReportCaller: true
+      NGAP:
+        debugLevel: info
+        ReportCaller: true
+      NamfComm:
+        debugLevel: info
+        ReportCaller: true
+      NamfEventExposure:
+        debugLevel: info
+        ReportCaller: true
+      NsmfPDUSession:
+        debugLevel: info
+        ReportCaller: true
+      NudrDataRepository:
+        debugLevel: info
+        ReportCaller: true
+      OpenApi:
+        debugLevel: info
+        ReportCaller: true
+      Aper:
+        debugLevel: info
+        ReportCaller: true
+      CommonConsumerTest:
+        debugLevel: info
+        ReportCaller: true
+    # webui
+      WEBUI:
+        debugLevel: info
+        ReportCaller: true
+
+

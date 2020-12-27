@@ -1,0 +1,55 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.app.name }}-preinstall-job
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": "pre-install"
+  {{- if .Values.global.preserveJobs }}
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+  {{- else }}
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+  {{- end }}
+    "helm.sh/hook-weight": "4"
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ .Values.global.app.name }}-preinstall-service-account
+      restartPolicy: Never
+      containers:
+        - name: preinstall
+          image: {{ include "image.registry" . | coalesce .Values.containers.preinstall.registry }}/waas-kubectl{{ include "image.version" . | coalesce .Values.containers.preinstall.version }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: KWAFNAMESPACE
+              value: {{ required "A valid KWAF Namespace required!" .Values.global.kwafns  }}
+            - name: NAMES_PREFIX
+              value: {{ .Values.global.namesPrefix }}
+            - name: APP_NAME
+              value: {{ .Values.global.app.name }}
+          command: ["/bin/bash"]
+          args:
+            - "-c"
+            - |-
+{{ .Files.Get "files/pre-install.sh" | indent 14 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+

@@ -25,7 +25,7 @@ spec:
             - name: NAMES_PREFIX
               value: waas-
             - name: APP_NAME
-              value: ausf
+              value: f5gc-ausf
           command: ["/bin/bash"]
           args:
             - "-c"

@@ -1,0 +1,49 @@
+#/bin/bash
+set -x
+<< 'MULTILINE-COMMENT'
+ $1 - cm/secret
+ $2 - name of cm/secret in WAAS namaspace
+ $3 - namespace of WAAS controller
+ $4 - namespace of Application
+ $5 - name of cm/secret in Application namaspace
+MULTILINE-COMMENT
+echo $1 $2 $3 $4 $5
+function copy_certs {
+    kubectl get $1 $2 -n $3 -o go-template='{{ index .data }}'>/dev/null 2>&1
+    if [ $? -eq 0 ]; then
+        kubectl get $1 $5 -n $4 -o go-template='{{ index .data }}' > /dev/null 2>&1
+        if [ $? -eq 1 ]; then
+            kubectl get $1 $2 -n $3 -o yaml | sed -e "s/namespace: $3/namespace: $4/" -e "s/name: $2/name: $5/"| kubectl apply -f -
+            echo "$1 $2 in ns $4 copied"
+        else
+            echo "$1 $5 in ns $4 already  exists"
+        fi
+    else
+        echo "FAILED" && exit 1
+    fi
+}
+function prepare_names_for_copy {
+    echo "Handling Copy Cerificates"
+    CONFIG_INFIX=$1
+    SECUREBEAT_CA_CONFIG=${NAMES_PREFIX}${CONFIG_INFIX}-ca-config
+    SECUREBEAT_CLIENT_SECRET=${NAMES_PREFIX}${CONFIG_INFIX}-client-secret
+    SECUREBEAT_CA_CONFIG_APP=${SECUREBEAT_CA_CONFIG}-${APP_NAME}
+    SECUREBEAT_CLIENT_SECRET_APP=${SECUREBEAT_CLIENT_SECRET}-${APP_NAME}
+    #set -e
+    copy_certs cm ${SECUREBEAT_CA_CONFIG} ${KWAFNAMESPACE} ${NAMESPACE} ${SECUREBEAT_CA_CONFIG_APP}
+    copy_certs secret ${SECUREBEAT_CLIENT_SECRET} ${KWAFNAMESPACE} ${NAMESPACE} ${SECUREBEAT_CLIENT_SECRET_APP}
+    #set +e
+    echo "copy_certs done [$(date +"%T")]"
+    echo ""
+}
+echo "WAAS Copy Certificates starting"
+echo ""
+echo "Print kubectl client and server versions"
+kubectl version
+echo ""
+echo "running for namespace ${NAMESPACE}"
+echo "running as user: ${UID}"
+echo ""
+prepare_names_for_copy securebeat
+echo "WAAS Preinstall job complete"
+exit 0

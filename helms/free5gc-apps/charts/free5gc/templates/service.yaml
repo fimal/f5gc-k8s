@@ -1,0 +1,27 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-{{ .Values.global.app.name}}
+  labels:
+    {{ .Values.global.namesPrefix }}prometheus-service: monitor
+    {{- include "waas.labels" . | indent 4 }}
+spec:
+  selector:
+    configid: {{ .Values.global.namesPrefix }}{{ .Chart.Name }}-{{ .Values.global.app.name}}-container
+  type: {{ .Values.global.serviceType }}
+  ports:
+    - port: {{ .Values.global.containerPort }}
+      targetPort: 9000
+      {{ include "waas.nodeport" . }}
+      name: http
+      protocol: TCP
+    - port: 8080
+      targetPort: 19010
+      protocol: TCP
+      name: stats
+    - port: 2020
+      targetPort: 2020
+      protocol: TCP
+      name: fb-stats
+{{- end }}

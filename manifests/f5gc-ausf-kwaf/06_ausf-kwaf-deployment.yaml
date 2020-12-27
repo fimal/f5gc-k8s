@@ -108,11 +108,11 @@ spec:
       - name: securebeat-ca-volume-f5gc-ausf
         configMap:
           defaultMode: 420
-          name: waas-securebeat-ca-config-ausf
+          name: waas-securebeat-ca-config-f5gc-ausf
       - name: securebeat-client-volume-f5gc-ausf
         secret:
           defaultMode: 420
-          secretName: waas-securebeat-client-secret-ausf
+          secretName: waas-securebeat-client-secret-f5gc-ausf
       - emptyDir: {}
         name: logs-volume
       - name: f5gc-ausf-cert

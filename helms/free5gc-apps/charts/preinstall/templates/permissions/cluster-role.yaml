@@ -1,0 +1,29 @@
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: {{ .Values.global.app.name }}-preinstall-role
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+  annotations:
+    "helm.sh/hook": "pre-install"
+    "helm.sh/hook-weight": "1"
+    "helm.sh/hook-delete-policy": "before-hook-creation"
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["update","get","delete"]
+    resourceNames:
+      - "{{ .Values.global.namesPrefix }}securebeat-client-secret-{{ .Values.global.app.name }}"
+      - "{{ .Values.global.namesPrefix }}securebeat-client-secret"
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["create"]
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    verbs: ["update","get","delete"]
+    resourceNames:
+      - "{{ .Values.global.namesPrefix }}securebeat-ca-config-{{ .Values.global.app.name }}"
+      - "{{ .Values.global.namesPrefix }}securebeat-ca-config"

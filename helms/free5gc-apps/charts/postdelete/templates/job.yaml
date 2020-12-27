@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.global.app.name }}-postdelete-job
+  labels:
+    {{- include "waas.labels" . | indent 4 }}
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": "post-delete"
+    "helm.sh/hook-delete-policy": "hook-succeeded,before-hook-creation"
+    "helm.sh/hook-weight": "4"
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+    spec:
+      serviceAccountName: {{ .Values.global.app.name }}-postdelete-service-account
+      restartPolicy: Never
+      containers:
+        - name: postdelete
+          image: {{ include "image.registry" . | coalesce .Values.containers.postdelete.registry }}/waas-kubectl{{ include "image.version" . | coalesce .Values.containers.postdelete.version }}
+          imagePullPolicy: {{ .Values.global.image.pullPolicy }}
+          env:
+            - name: NAMES_PREFIX
+              value: {{ .Values.global.namesPrefix }}
+            - name: RELEASE
+              value: {{ .Release.Name }}
+            - name: NAMESPACE
+              value: {{ .Release.Namespace }}
+            - name: APP_NAME
+              value: {{ .Values.global.app.name }}
+          command: ["/bin/bash"]
+          args:
+            - "-c"
+            - |-
+{{ .Files.Get "files/post-delete.sh" | indent 14 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
