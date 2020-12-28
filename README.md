@@ -19,38 +19,67 @@ NOTE: Can work at version `5.0.0-23-generic` to run UPF(GTP5G Module.)
 ### Installing and testing
 
 * Download the related files.
-
 ```
 $ git clone https://github.com/fimal/f5gc-k8s.git
 $ cd f5gc-k8s
 ```
 
-* install K8S cluster with Calico CNI and MULTUS
+* Install K8S cluster kubeadm
 ```
-$ kubectl apply -f clusters/cni/calico/ 		# installing calico cni
-$ kubectl apply -f clusters/cni/multus/			# installing multus
+$ sudo kubeadm init --pod-network-cidr=192.167.0.0/16 --service-cidr=10.96.0.0/16
+$ mkdir -p $HOME/.kube
+$ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+$ sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+* Install K8S cluster with Calico CNI
+```
+$ kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml		# installing calico cni
+$ kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
+Note: Before creating this manifest, read its contents and make sure its settings are correct for your environment. For example, you may need to change the default IP pool CIDR to match your pod network CIDR.
+```
+
+* Install Multus
+```
+$ git clone https://github.com/intel/multus-cni.git && cd multus-cni
+$ cat ./images/multus-daemonset.yml | kubectl apply -f -
 ```
 
 * Build images.
-
 ```
 $ cd images
 $ make build-base	# building base image
 $ make build-amf    # building amf image
 $ make build-container
-
 ```
+
  * Build IC (IMSI Cracking)
- * NAT rules
+ ```
+ $ cd images/f5gc-ic
+ $ make build-container
+ ```
 
+ * Run Manifest
 ```
-$ iptables -t nat -A POSTROUTING -s 60.60.0.0/16 -d 10.98.0.0/16 -j SNAT --to-source 172.20.104.54 #add rule
+$ cd manifests
+$ kubectl apply -k f5gc-nrf # First SBI function should be DB and NRF
+or
+$ ./run create
+```
+
+ * Build AUSF with HELM
+ ```
+ $ helm install ausf -n f5gc free5gc-apps/ -f waas/values.yaml -f free5gc-apps/values.yaml -f free5gc-apps/applications/ausf.yaml --debug
+ ```
+
+ * NAT rules - in order to route traffic to SBI and Internet
+```
+$ iptables -t nat -A POSTROUTING -s 60.60.0.0/16 -d 10.96.0.0/16 -j SNAT --to-source 172.20.104.54 #add rule to SBI NF
 $ iptables -t nat -v -L POSTROUTING -n --line-number             # list all nat rules
 $ iptables -t nat -D POSTROUTING 1                               # delete rule line 1
-
 ```
- * Tuning MTU - k8s node configure mtu
 
+ * Tuning MTU - each k8s node need to configure mtu and update mtu on tunneling interfaces (N3 - GTPU)
 ```
- $ p link set dev ens224 mtu 9000
+ $ ip link set dev ens224 mtu 9000
 ```
