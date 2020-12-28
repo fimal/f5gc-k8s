@@ -16,7 +16,7 @@ gNB/UE simulators used from project: https://github.com/aligungr/UERANSIM and ht
 
 NOTE: Can work at version `5.0.0-23-generic` to run UPF(GTP5G Module.)
 
-![Image of 5G](https://github.com/fimal/f5gc-k8s/5G.png)
+![Image of 5G](https://github.com/fimal/f5gc-k8s/blob/main/5G.png)
 
 ### Installing and testing
 
