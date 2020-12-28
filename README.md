@@ -16,6 +16,8 @@ gNB/UE simulators used from project: https://github.com/aligungr/UERANSIM and ht
 
 NOTE: Can work at version `5.0.0-23-generic` to run UPF(GTP5G Module.)
 
+![Image of 5G](https://github.com/fimal/f5gc-k8s/5G.png)
+
 ### Installing and testing
 
 * Download the related files.
@@ -50,7 +52,6 @@ $ cat ./images/multus-daemonset.yml | kubectl apply -f -
 $ cd images
 $ make build-base	# building base image
 $ make build-amf    # building amf image
-$ make build-container
 ```
 
  * Build IC (IMSI Cracking)
