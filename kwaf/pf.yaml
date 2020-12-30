@@ -1,0 +1,78 @@
+apiVersion: v1
+items:
+- apiVersion: waas.radware.com/v1beta1
+  kind: Profile
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/last-applied-configuration: |
+        {"apiVersion":"waas.radware.com/v1beta1","kind":"Profile","metadata":{"annotations":{},"labels":{"app.kubernetes.io/instance":"WAAS","app.kubernetes.io/name":"WAAS","release":"f5gc-ausf"},"name":"waas-f5gc-ausf-profile","namespace":"f5gc"},"spec":{"policies":[{"classifiers":[{"hostname":"*","id":"classifier1","path":{"operand":"Prefix","value":"/"},"protectionId":"protection1"}],"name":"waas-f5gc-ausf-policy","operatorEmail":"support@radware.com","protections":[{"id":"protection1","signatures":{"opMode":"Active"}}]}]}}
+    creationTimestamp: "2020-12-30T14:11:31Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 1
+    labels:
+      app.kubernetes.io/instance: WAAS
+      app.kubernetes.io/name: WAAS
+      release: f5gc-ausf
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+        f:status:
+          .: {}
+          f:hash: {}
+          f:lastUpdate: {}
+          f:state: {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-30T14:11:31Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            .: {}
+            f:kubectl.kubernetes.io/last-applied-configuration: {}
+          f:labels:
+            .: {}
+            f:app.kubernetes.io/instance: {}
+            f:app.kubernetes.io/name: {}
+            f:release: {}
+        f:spec:
+          .: {}
+          f:policies: {}
+      manager: kubectl-client-side-apply
+      operation: Update
+      time: "2020-12-30T14:11:31Z"
+    name: waas-f5gc-ausf-profile
+    namespace: f5gc
+    resourceVersion: "9917008"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/profiles/waas-f5gc-ausf-profile
+    uid: 84198f52-bd43-4bd5-abde-f529e086b327
+  spec:
+    policies:
+    - classifiers:
+      - hostname: '*'
+        id: classifier1
+        path:
+          operand: Prefix
+          value: /
+        protectionId: protection1
+      name: waas-f5gc-ausf-policy
+      operatorEmail: support@radware.com
+      protections:
+      - id: protection1
+        signatures:
+          opMode: Active
+  status:
+    hash: 3c0778eeff6d63701516c49a909342a71e29c876484646289741f9694887c647
+    lastUpdate: "2020-12-30T14:11:31Z"
+    state: Accepted
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

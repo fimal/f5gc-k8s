@@ -43,11 +43,11 @@ spec:
         command:
         - /wrapper.sh
         - -m=waas-controller-service
-        - -p=f5gc/waas-sample-app-f5gc-ausf-profile
+        - -p=f5gc/waas-f5gc-ausf-profile
         - -n=kwaf
-        - -t=waas-sample-app-f5gc-ausf
+        - -t=waas-f5gc-ausf
         - -e
-        - -c=9000:waas-sample-app-f5gc-ausf-policy:127.0.0.1:29509
+        - -c=9000:waas-f5gc-ausf-policy:127.0.0.1:29509
         - -l=$HOSTNAME_access.log
         - -f=$HOSTNAME_security.log
         env:
@@ -56,7 +56,7 @@ spec:
         - name: ENFORCER_OPT_BASE_ID
           value: "323"
         image: devart01:8081/waas-snapshot-local/waas-bootstrap/dev:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         ports:
         - containerPort: 19010
           name: stats
@@ -71,7 +71,7 @@ spec:
         - name: PROCESS_TO_SIGNAL
           value: waas_enforcer
         image: devart01:8081/waas-snapshot-local/waas-logrotate/dev:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: logrotate
         resources: {}
         terminationMessagePath: /dev/termination-log
@@ -85,7 +85,7 @@ spec:
         - name: FB_PREFIX
           value: waas-f5gc-ausf.f5gc
         image: devart01:8081/waas-snapshot-local/waas-fluentbit/dev:latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: fluentbit
         resources: {}
         terminationMessagePath: /dev/termination-log

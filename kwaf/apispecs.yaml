@@ -1,0 +1,199 @@
+apiVersion: v1
+items:
+- apiVersion: waas.radware.com/v1beta1
+  kind: APISpec
+  metadata:
+    creationTimestamp: "2020-12-29T16:00:23Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 2
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-29T16:00:23Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          .: {}
+          f:openapi: {}
+          f:overrides: {}
+      manager: unknown
+      operation: Update
+      time: "2020-12-29T16:01:46Z"
+    name: waas-f5gc-ausf-profile-ausf-auth-1609257623
+    namespace: f5gc
+    resourceVersion: "9733158"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/apispecs/waas-f5gc-ausf-profile-ausf-auth-1609257623
+    uid: b2d96ad5-172f-4a01-8b1e-22da49a64c06
+  spec:
+    openapi: c-1609257179
+    overrides: |
+      paths:
+        /ue-authentications: {}
+        '/ue-authentications/{authCtxId}/5g-aka-confirmation': {}
+        '/ue-authentications/{authCtxId}/eap-session': {}
+- apiVersion: waas.radware.com/v1beta1
+  kind: APISpec
+  metadata:
+    creationTimestamp: "2020-12-29T16:00:16Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 2
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-29T16:00:17Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          .: {}
+          f:openapi: {}
+          f:overrides: {}
+      manager: unknown
+      operation: Update
+      time: "2020-12-29T16:02:02Z"
+    name: waas-f5gc-ausf-profile-ausf-sor-1609257616
+    namespace: f5gc
+    resourceVersion: "9733202"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/apispecs/waas-f5gc-ausf-profile-ausf-sor-1609257616
+    uid: 16a888bf-d5a1-4b59-b168-bde58f589939
+  spec:
+    openapi: b-1609257171
+    overrides: |
+      paths:
+        '/{supi}/ue-sor': {}
+- apiVersion: waas.radware.com/v1beta1
+  kind: APISpec
+  metadata:
+    creationTimestamp: "2020-12-29T15:55:54Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 2
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-29T15:55:54Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          .: {}
+          f:openapi: {}
+          f:overrides: {}
+      manager: unknown
+      operation: Update
+      time: "2020-12-29T15:59:24Z"
+    name: waas-f5gc-ausf-profile-ausf-upuprotection-1609257354
+    namespace: f5gc
+    resourceVersion: "9732811"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/apispecs/waas-f5gc-ausf-profile-ausf-upuprotection-1609257354
+    uid: 00bad575-ac5b-4498-b509-8a62f4a6526e
+  spec:
+    openapi: a-1609257157
+    overrides: |
+      undefined
+- apiVersion: waas.radware.com/v1beta1
+  kind: APISpec
+  metadata:
+    creationTimestamp: "2020-12-29T16:00:09Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 3
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-29T16:00:09Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          .: {}
+          f:openapi: {}
+          f:overrides: {}
+      manager: unknown
+      operation: Update
+      time: "2020-12-30T09:06:12Z"
+    name: waas-f5gc-ausf-profile-ausf-upuprotection-1609257609
+    namespace: f5gc
+    resourceVersion: "9873628"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/apispecs/waas-f5gc-ausf-profile-ausf-upuprotection-1609257609
+    uid: ed35c95d-f088-4b18-a46c-c7e948fe916d
+  spec:
+    openapi: a-1609257157
+    overrides: |
+      paths:
+        '/{supi}/ue-upu': {}
+- apiVersion: waas.radware.com/v1beta1
+  kind: APISpec
+  metadata:
+    creationTimestamp: "2020-12-29T15:56:29Z"
+    finalizers:
+    - finalizer.waas.radware.com
+    generation: 5
+    managedFields:
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:finalizers:
+            .: {}
+            v:"finalizer.waas.radware.com": {}
+      manager: ctrlr
+      operation: Update
+      time: "2020-12-29T15:56:29Z"
+    - apiVersion: waas.radware.com/v1beta1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:spec:
+          .: {}
+          f:openapi: {}
+          f:overrides: {}
+      manager: unknown
+      operation: Update
+      time: "2020-12-30T09:07:02Z"
+    name: waas-f5gc-ausf-profile-protection1-1609257389
+    namespace: f5gc
+    resourceVersion: "9873746"
+    selfLink: /apis/waas.radware.com/v1beta1/namespaces/f5gc/apispecs/waas-f5gc-ausf-profile-protection1-1609257389
+    uid: 44efd7b5-d489-4bc3-8b4c-ca7e5c80307a
+  spec:
+    openapi: c-1609257179
+    overrides: |
+      paths:
+        /ue-authentications: {}
+        '/ue-authentications/{authCtxId}/5g-aka-confirmation': {}
+        '/ue-authentications/{authCtxId}/eap-session': {}
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""

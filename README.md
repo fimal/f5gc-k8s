@@ -20,13 +20,13 @@ NOTE: Can work at version `5.0.0-23-generic` to run UPF(GTP5G Module.)
 
 ### Installing and testing
 
-* Download the related files.
+## Download the related files.
 ```
 $ git clone https://github.com/fimal/f5gc-k8s.git
 $ cd f5gc-k8s
 ```
 
-* Install K8S cluster kubeadm
+## Install K8S cluster kubeadm
 ```
 $ sudo kubeadm init --pod-network-cidr=192.167.0.0/16 --service-cidr=10.96.0.0/16
 $ mkdir -p $HOME/.kube
@@ -34,53 +34,65 @@ $ sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 $ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 ```
 
-* Install K8S cluster with Calico CNI
+## Install K8S cluster with Calico CNI
 ```
 $ kubectl create -f https://docs.projectcalico.org/manifests/tigera-operator.yaml		# installing calico cni
 $ kubectl create -f https://docs.projectcalico.org/manifests/custom-resources.yaml
 Note: Before creating this manifest, read its contents and make sure its settings are correct for your environment. For example, you may need to change the default IP pool CIDR to match your pod network CIDR.
 ```
 
-* Install Multus
+## Install Multus
 ```
 $ git clone https://github.com/intel/multus-cni.git && cd multus-cni
 $ cat ./images/multus-daemonset.yml | kubectl apply -f -
 ```
 
-* Build images.
+## Build images.
 ```
 $ cd images
 $ make build-base	# building base image
 $ make build-amf    # building amf image
 ```
 
- * Build IC (IMSI Cracking)
+## Install Radware KWAF
+Download HELMs and images from Radware site
+Follow https://www.radware.com/products/kubernetes-waf1
+Follow instruction in Installation guide
+
+### Build IC (IMSI Cracking deployment)
  ```
  $ cd images/f5gc-ic
  $ make build-container
  ```
 
- * Run Manifest
+## Run Manifest
 ```
 $ cd manifests
 $ kubectl apply -k f5gc-nrf # First SBI function should be DB and NRF
 or
-$ ./run create
+$ ./run apply
 ```
 
- * Build AUSF with HELM
+## Apply KWAF Configuration
+```
+kubectl apply kwaf/
+```
+
+## Build AUSF with HELM
  ```
  $ helm install ausf -n f5gc free5gc-apps/ -f waas/values.yaml -f free5gc-apps/values.yaml -f free5gc-apps/applications/ausf.yaml --debug
  ```
 
- * NAT rules - in order to route traffic to SBI and Internet
+## NAT rules - in order to route traffic to SBI and Internet
 ```
-$ iptables -t nat -A POSTROUTING -s 60.60.0.0/16 -d 10.96.0.0/16 -j SNAT --to-source 172.20.104.54 #add rule to SBI NF
+$ kubectl exec -it -n f5gc f5gc-upf-67db5cb59d-jnpfp -c f5gc-upf -- bash
+$
+$ iptables -t nat -A POSTROUTING -s 60.60.0.0/16 -d 10.96.0.0/12 -j SNAT --to-source {upf-pod-ip-address} #add rule to SBI NF
 $ iptables -t nat -v -L POSTROUTING -n --line-number             # list all nat rules
 $ iptables -t nat -D POSTROUTING 1                               # delete rule line 1
 ```
 
- * Tuning MTU - each k8s node need to configure mtu and update mtu on tunneling interfaces (N3 - GTPU)
+## Tuning MTU - each k8s node need to configure mtu and update mtu on tunneling interfaces (N3 - GTPU)
 ```
  $ ip link set dev ens224 mtu 9000
 ```
