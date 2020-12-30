@@ -55,8 +55,8 @@ $ make build-amf    # building amf image
 ```
 
 ## Install Radware KWAF
-Download HELMs and images from Radware site
-Follow https://www.radware.com/products/kubernetes-waf1
+Download HELMs and images from Radware site.
+https://www.radware.com/products/kubernetes-waf1 .
 Follow instruction in Installation guide
 
 ### Build IC (IMSI Cracking deployment)
