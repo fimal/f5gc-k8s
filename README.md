@@ -78,7 +78,8 @@ $ ./run apply
 kubectl apply kwaf/
 ```
 
-## Optionally Build AUSF with HELM (run manifest already include ausf-nf with kwaf)
+## Optionally Build AUSF with HELM
+* Run manifest section already include in script installing ausf-nf with kwaf
  ```
  $ helm install ausf -n f5gc free5gc-apps/ -f waas/values.yaml -f free5gc-apps/values.yaml -f free5gc-apps/applications/ausf.yaml --debug
  ```
